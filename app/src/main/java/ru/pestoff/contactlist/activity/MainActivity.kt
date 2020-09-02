@@ -7,41 +7,23 @@ import retrofit2.Call
 import ru.pestoff.contactlist.R
 import ru.pestoff.contactlist.model.Person
 import ru.pestoff.contactlist.service.PersonService
-import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import retrofit2.Callback
 import retrofit2.Response
+import ru.pestoff.contactlist.fragment.ListPersonFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val fragment = supportFragmentManager
+            .findFragmentById(R.id.fragment_container)
 
-        val executors = ScheduledThreadPoolExecutor(10)
-
-        executors.execute {
-            val service = PersonService.create()
-
-            val call = service.getPersons()
-
-            call.enqueue(object: Callback<List<Person>> {
-                override fun onFailure(call: Call<List<Person>>, t: Throwable) {
-                    Log.e("CONTACTLIST", t.message!!)
-                }
-
-                override fun onResponse(
-                    call: Call<List<Person>>,
-                    response: Response<List<Person>>
-                ) {
-                    val persons = response.body()!!
-
-                    persons.forEach {
-                        Log.i("CONTACTLIST",it.name)
-                    }
-                }
-            })
-
+        if (fragment == null) {
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container, ListPersonFragment())
+                .commit()
         }
     }
 }
