@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,10 +17,14 @@ import retrofit2.Response
 import ru.pestoff.contactlist.R
 import ru.pestoff.contactlist.adapter.PersonAdapter
 import ru.pestoff.contactlist.model.Person
+import ru.pestoff.contactlist.repository.PersonRepository
 import ru.pestoff.contactlist.service.PersonService
+import ru.pestoff.contactlist.viewModel.ListPersonViewModel
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
 class ListPersonFragment : Fragment() {
+
+    private lateinit var personAdapter: PersonAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,45 +38,28 @@ class ListPersonFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.list_person_fragment, container, false)
 
+        initViewModel()
         initRecyclerView(view)
 
         return view
     }
 
+    private fun initViewModel() {
+        val viewModel = ListPersonViewModel(PersonRepository(PersonService.create()))
 
-    fun initRecyclerView(view: View) {
+        viewModel.loadPerson()
+
+        viewModel.persons.observe(viewLifecycleOwner, Observer {
+            personAdapter.persons = it!!
+        })
+    }
+
+    private fun initRecyclerView(view: View) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
 
         recyclerView.layoutManager = LinearLayoutManager(activity)
 
-        val personAdapter = PersonAdapter()
+        personAdapter = PersonAdapter()
         recyclerView.adapter = personAdapter
-
-
-
-        val executors = ScheduledThreadPoolExecutor(10)
-
-        executors.execute {
-            val service = PersonService.create()
-
-            val call = service.getPersons()
-
-            call.enqueue(object: Callback<List<Person>> {
-                override fun onFailure(call: Call<List<Person>>, t: Throwable) {
-                    Log.e("CONTACTLIST", t.message!!)
-                }
-
-                override fun onResponse(
-                    call: Call<List<Person>>,
-                    response: Response<List<Person>>
-                ) {
-                    personAdapter.persons = response.body()!!
-                }
-            })
-
-        }
-
-
-
     }
 }
