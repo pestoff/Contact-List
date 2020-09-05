@@ -8,7 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.pestoff.contactlist.R
 import ru.pestoff.contactlist.model.Person
 
-class PersonAdapter : RecyclerView.Adapter<PersonAdapter.PersonViewHolder>() {
+class PersonAdapter(private val onClickListener: OnClickListener) : RecyclerView.Adapter<PersonAdapter.PersonViewHolder>() {
+
+    interface OnClickListener {
+        fun OnClick(person: Person)
+    }
 
     var persons = emptyList<Person>()
         set(value) {
@@ -36,6 +40,11 @@ class PersonAdapter : RecyclerView.Adapter<PersonAdapter.PersonViewHolder>() {
         private val heightTextView: TextView = itemView.findViewById(R.id.item_height)
 
         fun bind(person: Person) {
+
+            itemView.setOnClickListener {
+                onClickListener.OnClick(person)
+            }
+
             telephoneTextView.text = person.phone
             nameTextView.text = person.name
             heightTextView.text = person.height
