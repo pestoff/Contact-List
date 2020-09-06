@@ -3,12 +3,14 @@ package ru.pestoff.contactlist.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ru.pestoff.contactlist.R
 import ru.pestoff.contactlist.model.Person
 
-class PersonAdapter(private val onClickListener: OnClickListener) : RecyclerView.Adapter<PersonAdapter.PersonViewHolder>() {
+class PersonAdapter(private val onClickListener: OnClickListener) : RecyclerView.Adapter<PersonAdapter.PersonViewHolder>(), Filterable {
 
     interface OnClickListener {
         fun OnClick(person: Person)
@@ -17,8 +19,11 @@ class PersonAdapter(private val onClickListener: OnClickListener) : RecyclerView
     var persons = emptyList<Person>()
         set(value) {
             field = value
+            personsFiltered = field
             notifyDataSetChanged()
         }
+
+    var personsFiltered = persons
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PersonViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -27,10 +32,42 @@ class PersonAdapter(private val onClickListener: OnClickListener) : RecyclerView
         return PersonViewHolder(itemView)
     }
 
-    override fun getItemCount() = persons.size
+    override fun getItemCount() = personsFiltered.size
 
     override fun onBindViewHolder(holder: PersonViewHolder, position: Int) {
-       holder.bind(persons[position])
+       holder.bind(personsFiltered[position])
+    }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(p0: CharSequence?): FilterResults {
+                val charString = p0.toString()
+                if (charString.isEmpty()) {
+                    personsFiltered = persons
+                } else {
+                    val filteredList = mutableListOf<Person>()
+
+                    persons.forEach {
+                        if (it.name.toLowerCase().contains(charString.toLowerCase()) ||
+                                it.phone.toLowerCase().contains(charString.toLowerCase())) {
+                            filteredList.add(it)
+                        }
+                    }
+
+                    personsFiltered = filteredList
+                }
+
+                val result = FilterResults()
+                result.values = personsFiltered
+                return result
+            }
+
+            override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
+                personsFiltered = p1?.values as List<Person>
+                notifyDataSetChanged()
+            }
+
+        }
     }
 
     inner class PersonViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

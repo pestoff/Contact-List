@@ -1,10 +1,14 @@
 package ru.pestoff.contactlist.fragment
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import ru.pestoff.contactlist.R
@@ -28,6 +32,7 @@ class DetailsPersonFragment : Fragment() {
         }
 
         initLayout(view)
+        configurationToolbar(view)
 
         return view
     }
@@ -44,14 +49,32 @@ class DetailsPersonFragment : Fragment() {
             phone.text = it.phone
             temperament.text = it.temperament
 
-
-
             educationPeriod.text = "${convertDate(it.educationPeriod.start)} - ${convertDate(it.educationPeriod.end)}"
             biography.text = it.biography
         }
+
+        phone.setOnClickListener {
+            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${phone.text}"))
+            startActivity(intent)
+        }
     }
 
-    fun convertDate(date: Date): String {
+    private fun configurationToolbar(view: View) {
+        val appCompatActivity = activity as AppCompatActivity
+        val toolbar = view.findViewById<Toolbar>(R.id.details_toolbar)
+        toolbar.title = ""
+
+        appCompatActivity.setSupportActionBar(toolbar)
+
+        appCompatActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        appCompatActivity.supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        toolbar.setNavigationOnClickListener {
+            activity?.supportFragmentManager?.popBackStack()
+        }
+    }
+
+    private fun convertDate(date: Date): String {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy")
 
         return dateFormat.format(date)

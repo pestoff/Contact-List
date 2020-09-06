@@ -2,10 +2,11 @@ package ru.pestoff.contactlist.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ProgressBar
+import android.widget.SearchView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -48,6 +49,28 @@ class ListPersonFragment : Fragment() {
         retainInstance = true
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(
+            object: SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(p0: String?): Boolean {
+                    personAdapter.filter.filter(p0)
+                    return false
+                }
+
+                override fun onQueryTextChange(p0: String?): Boolean {
+                    personAdapter.filter.filter(p0)
+                    return false
+                }
+            }
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,6 +82,7 @@ class ListPersonFragment : Fragment() {
 
         initViewModel(view)
         initRecyclerView(view)
+        configurationToolbar(view)
 
         progressBar = view.findViewById(R.id.progress_bar)
 
@@ -112,5 +136,14 @@ class ListPersonFragment : Fragment() {
             swipeContainer.isRefreshing = false
 
         }
+    }
+
+    private fun configurationToolbar(view: View) {
+        val appCompatActivity = activity as AppCompatActivity
+        val toolbar = view.findViewById<Toolbar>(R.id.list_toolbar)
+
+        setHasOptionsMenu(true)
+
+        appCompatActivity.setSupportActionBar(toolbar)
     }
 }
