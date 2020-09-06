@@ -11,18 +11,4 @@ import ru.pestoff.contactlist.model.Person
 @TypeConverters(DateConverter::class)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun getPersonDao(): PersonDao
-
-    companion object {
-        private var INSTANCE: AppDatabase? = null
-
-        fun getAppDatabase(context: Context): AppDatabase {
-            INSTANCE = INSTANCE ?:
-                    Room.databaseBuilder(context.applicationContext,
-                        AppDatabase::class.java,
-                        "appDatabase")
-                        .build()
-
-            return INSTANCE!!
-        }
-    }
 }

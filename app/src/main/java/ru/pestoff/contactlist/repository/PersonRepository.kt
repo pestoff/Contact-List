@@ -6,10 +6,13 @@ import io.reactivex.functions.Function3
 import ru.pestoff.contactlist.database.PersonDao
 import ru.pestoff.contactlist.model.Person
 import ru.pestoff.contactlist.service.PersonService
-import java.time.LocalDateTime
 import java.util.*
+import javax.inject.Inject
 
-class PersonRepository(val service: PersonService, val personDao: PersonDao) {
+
+class PersonRepository
+    @Inject
+    constructor(val service: PersonService, val personDao: PersonDao) {
 
     private var requestTime = Calendar.getInstance()
 

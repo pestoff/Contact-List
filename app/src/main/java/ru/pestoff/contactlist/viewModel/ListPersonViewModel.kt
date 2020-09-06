@@ -7,8 +7,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import ru.pestoff.contactlist.model.Person
 import ru.pestoff.contactlist.repository.PersonRepository
+import javax.inject.Inject
 
-class ListPersonViewModel(val repository: PersonRepository) : ViewModel() {
+class ListPersonViewModel
+    @Inject
+    constructor(val repository: PersonRepository) : ViewModel() {
 
     val isLoading = MutableLiveData<Boolean>()
     val isError = MutableLiveData<Boolean>()

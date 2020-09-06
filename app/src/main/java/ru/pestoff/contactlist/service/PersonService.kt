@@ -12,20 +12,6 @@ import ru.pestoff.contactlist.model.Person
 
 
 interface PersonService {
-
     @GET("SkbkonturMobile/mobile-test-droid/master/json/{fileName}")
     fun getPersons(@Path("fileName") fileName: String ): Observable<List<Person>>
-
-    companion object {
-        fun create(): PersonService {
-
-            val retrofit = Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("https://raw.githubusercontent.com/")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
-
-            return retrofit.create(PersonService::class.java)
-        }
-    }
 }

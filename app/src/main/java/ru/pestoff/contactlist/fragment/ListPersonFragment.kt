@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,12 +18,14 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import ru.pestoff.contactlist.R
 import ru.pestoff.contactlist.adapter.PersonAdapter
+import ru.pestoff.contactlist.app.App
 import ru.pestoff.contactlist.database.AppDatabase
 import ru.pestoff.contactlist.model.Person
 import ru.pestoff.contactlist.repository.PersonRepository
 import ru.pestoff.contactlist.service.PersonService
 import ru.pestoff.contactlist.viewModel.ListPersonViewModel
 import java.lang.ClassCastException
+import javax.inject.Inject
 
 class ListPersonFragment : Fragment() {
 
@@ -28,8 +33,10 @@ class ListPersonFragment : Fragment() {
         fun onItemChosen(person: Person)
     }
 
+    @Inject
+    lateinit var viewModel: ListPersonViewModel
+
     private lateinit var personAdapter: PersonAdapter
-    private lateinit var viewModel: ListPersonViewModel
 
     private lateinit var listener: FragmentInteractionListener
 
@@ -47,6 +54,8 @@ class ListPersonFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.list_person_fragment, container, false)
+
+        App.getAppComponent().inject(this)
 
         initViewModel(view)
         initRecyclerView(view)
@@ -66,7 +75,6 @@ class ListPersonFragment : Fragment() {
     }
 
     private fun initViewModel(view: View) {
-        viewModel = ListPersonViewModel(PersonRepository(PersonService.create(), AppDatabase.getAppDatabase(requireActivity().applicationContext).getPersonDao()))
 
         viewModel.persons.observe(viewLifecycleOwner, Observer {
             personAdapter.persons = it!!
