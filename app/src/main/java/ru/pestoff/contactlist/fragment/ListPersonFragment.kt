@@ -25,6 +25,7 @@ import ru.pestoff.contactlist.model.Person
 import ru.pestoff.contactlist.repository.PersonRepository
 import ru.pestoff.contactlist.service.PersonService
 import ru.pestoff.contactlist.viewModel.ListPersonViewModel
+import ru.pestoff.contactlist.viewModel.ViewModelFactory
 import java.lang.ClassCastException
 import javax.inject.Inject
 
@@ -35,19 +36,15 @@ class ListPersonFragment : Fragment() {
     }
 
     @Inject
-    lateinit var viewModel: ListPersonViewModel
+    lateinit var viewModelFactory: ViewModelFactory
 
     private lateinit var personAdapter: PersonAdapter
+    private lateinit var viewModel: ListPersonViewModel
 
     private lateinit var listener: FragmentInteractionListener
 
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeContainer: SwipeRefreshLayout
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        retainInstance = true
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu, menu)
@@ -99,6 +96,7 @@ class ListPersonFragment : Fragment() {
     }
 
     private fun initViewModel(view: View) {
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ListPersonViewModel::class.java)
 
         viewModel.persons.observe(viewLifecycleOwner, Observer {
             personAdapter.persons = it!!
